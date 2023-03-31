@@ -1,0 +1,34 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [ "development" ]
+  pull_request:
+    branches: [ "development" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    
+    steps:
+    - uses: actions/checkout@v2
+
+
+  Deploy:
+      needs: build
+      runs-on: ubuntu-20.04
+      
+      steps:
+        - uses: actions/checkout@v2 
+        - name: Configure SSH
+          uses: appleboy/ssh-action@v0.1.7
+          with:
+            host: ${{ secrets.HOST }}
+            username: ${{ secrets.USERNAME }}
+            key: ${{ secrets.KEY }}
+            port: ${{ secrets.PORT }}
+            script: |
+              cd somani-admin/
+              sudo git pull
+              sudo npm i --force
+              sudo ng build
